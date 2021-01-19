@@ -1,0 +1,12 @@
+.sidebar {
+  background-color: var(--clr-primary);
+}
+.sidebar__add-btn {
+  background-color: var(--clr-accent) !important;
+  border: none !important;
+}
+.sidebar__add-btn:hover,
+.sidebar__add-btn:focus {
+  background-color: var(--clr-text) !important;
+  color: var(--clr-secondary) !important;
+}

@@ -1,0 +1,26 @@
+.event {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.event__title {
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.event:hover {
+  background-color: var(--clr-secondary);
+}
+.event-active {
+  background-color: var(--clr-secondary);
+}
+.event-list {
+  /* Small -> Header + Screen */
+  /* Large -> Header + Add Button */
+  height: 500px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}

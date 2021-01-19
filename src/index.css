@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap");
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+}
+:root {
+  --clr-primary: #3d0153;
+  --clr-secondary: #ec1138;
+  --clr-accent: #14bd05;
+  --clr-text: #fff;
+  --fnt-primary: "Barlow Semi Condensed";
+  --fnt-secondary: "Playfair Display";
+}
+
+body {
+  margin: 0;
+  font-family: var(--fnt-primary), "sans-serif" !important;
+  color: var(--clr-text) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.out {
+  border: 1px solid blue;
+}
+
+.d-sm-none {
+  display: none;
+}
+@media screen and (min-width: 768px) {
+  .d-md-block {
+    display: block;
+  }
+  .d-md-none {
+    display: none;
+  }
+}

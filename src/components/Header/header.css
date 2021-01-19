@@ -1,0 +1,27 @@
+.header__profile {
+  display: flex;
+}
+.header__profile-picture {
+  height: 55px;
+  width: 55px;
+  border-radius: 5px;
+  background-color: var(--clr-secondary);
+  background-size: contain;
+  background-position: center;
+}
+.header__profile-info {
+  display: flex;
+  flex-direction: column;
+}
+.profile-info__username {
+  font-weight: 700;
+  font-size: 18px;
+}
+.header__settings {
+  display: flex;
+  justify-content: flex-end;
+}
+.header__settings box-icon {
+  fill: var(--clr-secondary);
+  cursor: pointer;
+}

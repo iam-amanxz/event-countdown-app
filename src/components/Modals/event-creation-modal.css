@@ -1,0 +1,10 @@
+.event-creation-modal {
+  color: var(--clr-primary);
+}
+.event-creation-modal .form-control {
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  color: var(--clr-primary) !important;
+}
+.event-creation-modal .form-control::placeholder {
+  color: #a7a7a7 !important;
+}
