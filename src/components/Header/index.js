@@ -13,14 +13,14 @@ const Header = () => {
     <Col xs={12} className="header my-4">
       <Row>
         <Col xs={9} className="header__profile">
-          {/* <div
+          <div
             className="header__profile-picture mr-2"
             style={{ backgroundImage: `url(${currentUser.photoUrl})` }}
-          ></div> */}
+          ></div>
           <div className="header__profile-info">
-            {/* <span className="profile-info__username">
+            <span className="profile-info__username">
               Hello, {currentUser.username}
-            </span> */}
+            </span>
             <span className="profile-info__date">
               {moment().format("Do MMM [,] YYYY")}
             </span>
@@ -28,10 +28,15 @@ const Header = () => {
         </Col>
         <Col xs={3} className="header__settings">
           <box-icon
+            name="power-off"
+            size="md"
+            onClick={async () => await logout()}
+          ></box-icon>
+          {/* <box-icon
             name="dots-horizontal-rounded"
             size="md"
-            onClick={async () => logout()}
-          ></box-icon>
+            onClick={async () => await logout()}
+          ></box-icon> */}
         </Col>
       </Row>
     </Col>

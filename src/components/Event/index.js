@@ -9,13 +9,13 @@ const Event = ({ event }) => {
   return (
     <Row
       className={`event py-2 px-4 mb-2 ${
-        currentEvent.eventId === event.eventId ? "event-active" : ""
+        currentEvent.id === event.id ? "event-active" : ""
       }`}
       onClick={() => {
         setCurrentEvent(event);
       }}
     >
-      <p className="event__title">{event.eventTitle}</p>
+      <p className="event__title">{event.title}</p>
     </Row>
   );
 };

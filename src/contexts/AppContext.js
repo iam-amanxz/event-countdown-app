@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 // import firebase from "firebase/app";
 
 const AppContext = React.createContext();
@@ -18,6 +18,7 @@ export function AppProvider({ children }) {
   const [currentEvent, setCurrentEvent] = useState({});
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   //   Auth API
   async function signup(username, email, password) {
@@ -46,80 +47,105 @@ export function AppProvider({ children }) {
     // return auth.signInWithPopup(provider);
   }
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        setCurrentUser(null);
-      } else {
+    setCurrentUser(JSON.parse(localStorage.getItem("authUser")));
+    console.log("authUser", currentUser);
+
+    const unsubscribe = auth.onAuthStateChanged(
+      (user) => {
         const userRef = db.collection("users").doc(user.uid);
         userRef
           .get()
-          .then(function (doc) {
+          .then((doc) => {
             if (doc.exists) {
-              setCurrentUser({ id: user.uid, ...doc.data() });
+              const userObject = { id: user.uid, ...doc.data() };
+              setCurrentUser(userObject);
+              localStorage.setItem("authUser", JSON.stringify(userObject));
+              console.log("authUser", currentUser);
             } else {
               console.log("No such document!");
+              localStorage.removeItem("authUser");
               setCurrentUser(null);
+              console.log("authUser", currentUser);
             }
           })
-          .catch(function (error) {
-            console.log("Error getting document:", error);
+          .catch((e) => {
+            setError(e);
+            console.log("Error getting document:", e);
           });
+      },
+      () => {
+        localStorage.removeItem("authUser");
+        setCurrentUser(null);
+        console.log("authUser", currentUser);
       }
-    });
+    );
     setLoading(false);
     return unsubscribe;
   }, []);
 
   // Event API
-  async function addOrEditEvent(event) {
+  async function addEvent(event) {
     setError("");
     if (currentUser != null) {
-      if (!editMode) {
-        return db
-          .collection("users")
-          .doc(currentUser.id)
-          .collection("events")
-          .add(event);
-      } else {
-        // Update (Get Event By Id)
-        // const docRef = await db
-        //   .collection("users")
-        //   .doc(currentUser.id)
-        //   .collection("events")
-        //   .doc(event.id)
-        //   .get()
-        //   .then((doc) => {
-        //     if (doc.exists) {
-        //       return docRef.set({
-        //         eventTitle: event.eventTitle,
-        //       });
-        //     } else {
-        //       console.log("No such document!");
-        //     }
-        //   })
-        //   .catch((e) => {
-        //     console.error("Error adding document: ", e);
-        //   });
-      }
+      return db
+        .collection("users")
+        .doc(currentUser.id)
+        .collection("events")
+        .add(event);
     } else {
       setError("Please Authenticate");
     }
   }
   function getAllEvents() {
-    return (
-      db
-        .collection("users")
-        .doc(currentUser.id)
-        // .doc("yV82QYzPrlXR9Pg8iEw1Xv9HX1p2")
-        .collection("events")
-        .get()
-    );
+    return db
+      .collection("users")
+      .doc(currentUser.id)
+      .collection("events")
+      .orderBy("createdAt", "desc")
+      .get();
+  }
+  const fetchAllEvents = async () => {
+    try {
+      let events = [];
+      await getAllEvents()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            events.push({ id: doc.id, ...doc.data() });
+          });
+        })
+        .catch((e) => {
+          console.log(e.message);
+        });
+      setAllEvents(events);
+      setCurrentEvent(events[0]);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  function deleteEvent() {
+    return db
+      .collection("users")
+      .doc(currentUser.id)
+      .collection("events")
+      .doc(currentEvent.id)
+      .delete();
+  }
+
+  function uploadBackgroundImage(imageAsFile) {
+    return storage
+      .ref(
+        `backgroundImages/${currentUser.id}/${currentEvent.id}/${imageAsFile.name}`
+      )
+      .put(imageAsFile);
   }
 
   // States
   const value = {
+    uploadBackgroundImage,
     currentUser,
     error,
+    deleteEvent,
     setError,
     signup,
     login,
@@ -127,7 +153,7 @@ export function AppProvider({ children }) {
     signInWithGoogle,
     editMode,
     setEditMode,
-    addOrEditEvent,
+    addEvent,
     showCreateModal,
     setShowCreateModal,
     currentEvent,
@@ -135,6 +161,9 @@ export function AppProvider({ children }) {
     allEvents,
     getAllEvents,
     setAllEvents,
+    fetchAllEvents,
+    showDeleteModal,
+    setShowDeleteModal,
   };
 
   return (

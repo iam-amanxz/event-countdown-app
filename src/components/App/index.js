@@ -12,8 +12,8 @@ function App() {
   return (
     <Router>
       <div className="app">
-        {/* <PrivateRoute exact path="/" component={ActivityPage} /> */}
-        <Route exact path="/" component={ActivityPage} />
+        <PrivateRoute exact path="/" component={ActivityPage} />
+        {/* <Route exact path="/" component={ActivityPage} /> */}
         <Route path={ROUTES.SIGN_IN} component={LoginPage} />
         <Route path={ROUTES.SIGN_UP} component={SignupPage} />
       </div>

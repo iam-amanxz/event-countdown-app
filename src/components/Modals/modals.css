@@ -8,3 +8,10 @@
 .event-creation-modal .form-control::placeholder {
   color: #a7a7a7 !important;
 }
+.preview-img {
+  height: 100px;
+  width: 100px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 5px;
+}

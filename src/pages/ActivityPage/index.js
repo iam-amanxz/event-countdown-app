@@ -9,30 +9,11 @@ import { useApp } from "../../contexts/AppContext";
 import { useEffect } from "react";
 
 const ActivityPage = () => {
-  const { getAllEvents, setAllEvents, currentUser, setCurrentEvent } = useApp();
-
-  const fetchAllEvents = async () => {
-    try {
-      let events = [];
-      await getAllEvents()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            events.push({ eventId: doc.id, ...doc.data() });
-          });
-        })
-        .catch((e) => {
-          console.log(e.message);
-        });
-      setAllEvents(events);
-      setCurrentEvent(events[0]);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const { fetchAllEvents } = useApp();
 
   useEffect(() => {
     fetchAllEvents();
-  }, [currentUser]);
+  }, []);
 
   return (
     <div className="activity">
