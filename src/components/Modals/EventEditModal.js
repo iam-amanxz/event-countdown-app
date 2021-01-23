@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, ProgressBar } from "react-bootstrap";
 import DatePicker, {
   utils,
@@ -9,29 +9,43 @@ import { withFirebase } from "../../Firebase";
 
 import "./modals.css";
 
-const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
-  const { showCreateModal, setShowCreateModal } = useEvent();
+const EventEditModal = ({ firebase, currentUser, fetchAllEvents }) => {
+  const { showEditModal, setShowEditModal, currentEvent } = useEvent();
 
-  const backgroundUrl =
-    "https://firebasestorage.googleapis.com/v0/b/event-countdwon.appspot.com/o/backgroundImages%2Fbg.jpg?alt=media&token=e44c02c2-6cdc-46d4-b1cb-0bd76a664c34";
+  useEffect(() => {
+    setFormValues({
+      ...formValues,
+      title: currentEvent.title,
+      backgroundUrl: currentEvent.backgroundUrl,
+    });
 
-  const INITIAL_STATE = {
+    const currentDate = new Date(
+      currentEvent.date.year,
+      currentEvent.date.month - 1,
+      currentEvent.date.day,
+      0,
+      0,
+      0,
+      0
+    );
+    const defaultDateValue = {
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth() + 1,
+      day: currentDate.getDate(),
+    };
+    setDate(defaultDateValue);
+  }, [currentEvent]);
+
+  const [formValues, setFormValues] = useState({
     title: "",
-    backgroundUrl: backgroundUrl,
+    backgroundUrl: "",
     progress: 0,
     error: null,
     loading: false,
-  };
+  });
 
-  const [formValues, setFormValues] = useState(INITIAL_STATE);
+  const [date, setDate] = useState(new Date());
 
-  const today = new Date();
-  const defaultDateValue = {
-    year: today.getFullYear(),
-    month: today.getMonth() + 1,
-    day: today.getDate() + 1,
-  };
-  const [date, setDate] = useState(defaultDateValue);
   const [imageAsFile, setImageAsFile] = useState("");
 
   const handleInputChange = (e) => {
@@ -116,7 +130,6 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(currentUser.id);
 
     setFormValues({
       ...formValues,
@@ -126,32 +139,26 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
 
     try {
       const { title, backgroundUrl } = formValues;
-      const event = {
+      const updatedData = {
         title: title,
         backgroundUrl: backgroundUrl,
         date: date,
-        createdAt: firebase.fieldValue.serverTimestamp(),
       };
 
       firebase
-        .addEvent(event, currentUser.id)
+        .updateEvent(currentEvent.id, updatedData, currentUser.id)
         .then(() => {
-          console.log("Document successfully created!");
+          console.log("Document successfully updated!");
           fetchAllEvents();
-          setFormValues({
-            ...formValues,
-            title: "",
-            backgroundUrl: backgroundUrl,
-          });
-          setDate(defaultDateValue);
         })
         .catch((e) => {
+          console.log(e);
           setFormValues({
             ...formValues,
             error: e.message,
           });
         });
-      setShowCreateModal(false);
+      setShowEditModal(false);
     } catch (e) {
       setFormValues({
         ...formValues,
@@ -166,9 +173,9 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
   };
 
   return (
-    <Modal show={showCreateModal} className="event-creation-modal">
+    <Modal show={showEditModal} className="event-creation-modal">
       <Modal.Header>
-        <Modal.Title>Create a new event</Modal.Title>
+        <Modal.Title>Update event</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleFormSubmit}>
         <Modal.Body>
@@ -231,11 +238,11 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Close
           </Button>
           <Button variant="success" type="submit" disabled={formValues.loading}>
-            Create
+            Update
           </Button>
         </Modal.Footer>
       </Form>
@@ -243,4 +250,4 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
   );
 };
 
-export default withFirebase(EventCreationModal);
+export default withFirebase(EventEditModal);

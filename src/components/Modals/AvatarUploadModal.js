@@ -1,68 +1,46 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert, ProgressBar } from "react-bootstrap";
-import DatePicker, {
-  utils,
-} from "@hassanmojab/react-modern-calendar-datepicker";
-
-import { useEvent } from "../../contexts/EventContext";
+import { withRouter } from "react-router-dom";
 import { withFirebase } from "../../Firebase";
 
 import "./modals.css";
 
-const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
-  const { showCreateModal, setShowCreateModal } = useEvent();
-
-  const backgroundUrl =
-    "https://firebasestorage.googleapis.com/v0/b/event-countdwon.appspot.com/o/backgroundImages%2Fbg.jpg?alt=media&token=e44c02c2-6cdc-46d4-b1cb-0bd76a664c34";
-
+const AvatarUploadModal = ({
+  history,
+  firebase,
+  currentUser,
+  setShowAvatarUploadModal,
+  showAvatarUploadModal,
+}) => {
   const INITIAL_STATE = {
-    title: "",
-    backgroundUrl: backgroundUrl,
+    avatarUrl: "",
     progress: 0,
     error: null,
     loading: false,
   };
-
   const [formValues, setFormValues] = useState(INITIAL_STATE);
-
-  const today = new Date();
-  const defaultDateValue = {
-    year: today.getFullYear(),
-    month: today.getMonth() + 1,
-    day: today.getDate() + 1,
-  };
-  const [date, setDate] = useState(defaultDateValue);
   const [imageAsFile, setImageAsFile] = useState("");
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({
-      ...formValues,
-      [name]: value,
-    });
-  };
+  const [uploaded, setUploaded] = useState(false);
 
   const handleOnFileChange = (e) => {
     const image = e.target.files[0];
     if (image) {
       setImageAsFile(image);
-      console.log("Photo selected");
     } else {
       setImageAsFile("");
-      console.log("No Photo selected");
     }
   };
 
-  const handleBackgroundImageUpload = (e) => {
-    e.preventDefault();
+  const handleAvatarImageUpload = () => {
     setFormValues({
       ...formValues,
-      error: "",
+      error: null,
       loading: true,
     });
+    setUploaded(false);
 
     try {
-      firebase.uploadBackGroundImage(imageAsFile).on(
+      firebase.uploadAvatarImage(imageAsFile).on(
         "state_changed",
         (snapshot) => {
           setFormValues({
@@ -82,13 +60,14 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
         },
         () => {
           console.log("Image Uploaded");
+          setUploaded(true);
           firebase
-            .getBackgroundImageUrl(imageAsFile)
+            .getAvatarImageUrl(imageAsFile)
             .then((url) => {
               console.log("Got Url");
               setFormValues({
                 ...formValues,
-                backgroundUrl: url,
+                avatarUrl: url,
                 progress: 0,
               });
               setImageAsFile("");
@@ -116,43 +95,36 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(currentUser.id);
 
     setFormValues({
       ...formValues,
-      error: "",
+      error: null,
       loading: true,
     });
 
     try {
-      const { title, backgroundUrl } = formValues;
-      const event = {
-        title: title,
-        backgroundUrl: backgroundUrl,
-        date: date,
-        createdAt: firebase.fieldValue.serverTimestamp(),
-      };
-
+      const { avatarUrl } = formValues;
+      console.log("trying", avatarUrl);
       firebase
-        .addEvent(event, currentUser.id)
+        .updateAvatarUrl(avatarUrl, currentUser.id)
         .then(() => {
-          console.log("Document successfully created!");
-          fetchAllEvents();
+          console.log("Avatar successfully updated!");
           setFormValues({
             ...formValues,
-            title: "",
-            backgroundUrl: backgroundUrl,
+            avatarUrl: "",
           });
-          setDate(defaultDateValue);
+          history.go(0);
         })
         .catch((e) => {
+          console.log("Error");
           setFormValues({
             ...formValues,
             error: e.message,
           });
         });
-      setShowCreateModal(false);
+      setShowAvatarUploadModal(false);
     } catch (e) {
+      console.log(e);
       setFormValues({
         ...formValues,
         error: e,
@@ -166,43 +138,21 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
   };
 
   return (
-    <Modal show={showCreateModal} className="event-creation-modal">
+    <Modal show={showAvatarUploadModal} className="event-creation-modal">
       <Modal.Header>
-        <Modal.Title>Create a new event</Modal.Title>
+        <Modal.Title>Upload a new avatar</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleFormSubmit}>
         <Modal.Body>
-          <Form.Group controlId="formBasicTitle">
-            <Form.Label>Event Title</Form.Label>
-            <Form.Control
-              onChange={handleInputChange}
-              required
-              type="text"
-              placeholder="Enter title"
-              name="title"
-              value={formValues.title}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formBasicDate" className="d-flex flex-column">
-            <Form.Label>Event Date</Form.Label>
-            <DatePicker
-              value={date}
-              onChange={setDate}
-              inputPlaceholder="Select a date"
-              shouldHighlightWeekends
-              minimumDate={utils().getToday()}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formBasicImage" className="d-flex flex-column">
-            <Form.Label>Event Background</Form.Label>
-            <div className="d-flex">
-              <img
-                className="preview-img mr-3"
-                src={formValues.backgroundUrl}
-                alt="bg"
-              />
+          <Form.Group controlId="formBasicImage">
+            <div className="text-center">
+              {formValues.avatarUrl !== "" && (
+                <img
+                  className="preview-img mb-3"
+                  src={formValues.avatarUrl}
+                  alt="avatar"
+                />
+              )}
               <div>
                 <ProgressBar
                   striped
@@ -211,13 +161,15 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
                 />
                 <Form.File
                   className="my-3"
+                  style={{ display: "inline-block" }}
                   accept="image/png, image/jpeg"
                   onChange={handleOnFileChange}
                 />
                 <Button
+                  block
                   variant="primary"
                   disabled={formValues.loading || imageAsFile === ""}
-                  onClick={handleBackgroundImageUpload}
+                  onClick={handleAvatarImageUpload}
                 >
                   Upload Image
                 </Button>
@@ -231,11 +183,18 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
-            Close
+          <Button
+            variant="secondary"
+            onClick={() => setShowAvatarUploadModal(false)}
+          >
+            Discard
           </Button>
-          <Button variant="success" type="submit" disabled={formValues.loading}>
-            Create
+          <Button
+            variant="success"
+            type="submit"
+            disabled={formValues.loading || !uploaded}
+          >
+            Save
           </Button>
         </Modal.Footer>
       </Form>
@@ -243,4 +202,4 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
   );
 };
 
-export default withFirebase(EventCreationModal);
+export default withRouter(withFirebase(AvatarUploadModal));

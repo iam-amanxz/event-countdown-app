@@ -1,22 +1,19 @@
 import React from "react";
-import { Row } from "react-bootstrap";
-import "./event.css";
-import { useApp } from "../../contexts/AppContext";
+
+import { useEvent } from "../../contexts/EventContext";
 
 const Event = ({ event }) => {
-  const { currentEvent, setCurrentEvent } = useApp();
+  const { setCurrentEvent, currentEvent } = useEvent();
 
   return (
-    <Row
-      className={`event py-2 px-4 mb-2 ${
-        currentEvent.id === event.id ? "event-active" : ""
+    <div
+      className={`event-item ${
+        currentEvent && currentEvent.id === event.id ? "active" : ""
       }`}
-      onClick={() => {
-        setCurrentEvent(event);
-      }}
+      onClick={() => setCurrentEvent(event)}
     >
-      <p className="event__title">{event.title}</p>
-    </Row>
+      {event.title}
+    </div>
   );
 };
 

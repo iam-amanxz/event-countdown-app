@@ -1,18 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+
 import App from "./components/App";
-import reportWebVitals from "./reportWebVitals";
+import Firebase, { FirebaseContext } from "./Firebase";
+import { EventProvider } from "./contexts/EventContext";
+
 import "bootstrap/dist/css/bootstrap.min.css";
-import { AppProvider } from "./contexts/AppContext";
+import "@hassanmojab/react-modern-calendar-datepicker/lib/DatePicker.css";
+import "./index.css";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <AppProvider>
+  <FirebaseContext.Provider value={new Firebase()}>
+    <EventProvider>
       <App />
-    </AppProvider>
-  </React.StrictMode>,
+    </EventProvider>
+  </FirebaseContext.Provider>,
   document.getElementById("root")
 );
-
-reportWebVitals();

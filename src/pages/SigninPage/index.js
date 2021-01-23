@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Container, Button, Form, Alert } from "react-bootstrap";
+import { Card, Container, Button, Form } from "react-bootstrap";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
@@ -8,9 +8,8 @@ import * as ROUTES from "../../constants/routes";
 
 import "../auth.css";
 
-const SignUpPage = ({ firebase, history }) => {
+const SignInPage = ({ firebase, history }) => {
   const INITIAL_STATE = {
-    username: "",
     email: "",
     password: "",
     error: null,
@@ -28,8 +27,8 @@ const SignUpPage = ({ firebase, history }) => {
   };
 
   const handleFormSubmit = (e) => {
-    const { username, email, password } = formValues;
     e.preventDefault();
+    const { email, password } = formValues;
 
     setFormValues({
       ...formValues,
@@ -39,28 +38,67 @@ const SignUpPage = ({ firebase, history }) => {
 
     try {
       firebase
-        .doCreateUserWithEmailAndPassword(email, password)
-        .then((authUser) => {
-          console.log(`Signup Success with: ${authUser.user.uid}`);
-          setFormValues(INITIAL_STATE);
-
-          firebase
-            .addUserToDb(username, authUser.user.uid)
-            .then(() => {
-              console.log(`User added success`);
-              history.push(ROUTES.ACTIVITY);
-            })
-            .catch((e) => {
-              setFormValues({
-                ...formValues,
-                error: e.message,
-              });
-            });
+        .doSignInWithEmailAndPassword(email, password)
+        .then(() => {
+          console.log("Login success");
+          history.push(ROUTES.ACTIVITY);
         })
         .catch((e) => {
           setFormValues({
             ...formValues,
             error: e.message,
+          });
+        });
+    } catch (e) {
+      setFormValues({
+        ...formValues,
+        error: e,
+      });
+    }
+
+    setFormValues({
+      ...formValues,
+      loading: false,
+    });
+  };
+
+  const handleGoogleSignIn = () => {
+    setFormValues({
+      ...formValues,
+      loading: true,
+      error: "",
+    });
+
+    try {
+      firebase
+        .doSignInWithGoogle()
+        .then((result) => {
+          const {
+            user: { displayName, uid },
+            additionalUserInfo: { isNewUser },
+          } = result;
+          if (isNewUser) {
+            firebase
+              .addUserToDb(displayName.split(" ")[0], uid)
+              .then(() => {
+                console.log(`User added success`);
+                history.push(ROUTES.ACTIVITY);
+              })
+              .catch((e) => {
+                setFormValues({
+                  ...formValues,
+                  error: e.message,
+                });
+              });
+          } else {
+            console.log("Login success");
+            history.push(ROUTES.ACTIVITY);
+          }
+        })
+        .catch((e) => {
+          setFormValues({
+            ...formValues,
+            error: e,
           });
         });
     } catch (e) {
@@ -82,24 +120,9 @@ const SignUpPage = ({ firebase, history }) => {
         <Card className="auth-card">
           <Card.Body className="p-md-5">
             <Card.Title className="auth-title mb-4 text-center">
-              Sign Up
+              Sign In
             </Card.Title>
-            {formValues.error && (
-              <Alert variant="danger">{formValues.error}</Alert>
-            )}
             <Form onSubmit={handleFormSubmit}>
-              <Form.Group controlId="formBasicUsername">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  type="text"
-                  required
-                  placeholder="Username"
-                  name="username"
-                  onChange={handleInputChange}
-                  value={formValues.username}
-                />
-              </Form.Group>
-
               <Form.Group controlId="formBasicEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -131,12 +154,24 @@ const SignUpPage = ({ firebase, history }) => {
                 className="font-weight-bold text-uppercase"
                 block
               >
-                Sign Up
+                Sign In
               </Button>
             </Form>
 
+            <Card.Text className="text-center my-3">OR</Card.Text>
+
+            <Button
+              disabled={formValues.loading}
+              onClick={handleGoogleSignIn}
+              variant="outline-light "
+              className="font-weight-bold text-uppercase"
+              block
+            >
+              Continue with Google
+            </Button>
+
             <Card.Text className="text-center mt-3">
-              Already have an account? <Link to={ROUTES.SIGN_IN}>Sign In</Link>
+              Don't have an account? <Link to={ROUTES.SIGN_UP}>Register</Link>
             </Card.Text>
           </Card.Body>
         </Card>
@@ -145,4 +180,4 @@ const SignUpPage = ({ firebase, history }) => {
   );
 };
 
-export default compose(withRouter, withFirebase)(SignUpPage);
+export default compose(withRouter, withFirebase)(SignInPage);

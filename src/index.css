@@ -7,7 +7,7 @@
   padding: 0;
 }
 :root {
-  --clr-primary: #290036;
+  --clr-primary: #2a003a;
   --clr-secondary: #ec1138;
   --clr-accent: #14bd05;
   --clr-text: #fff;
@@ -18,9 +18,11 @@
 body {
   margin: 0;
   font-family: var(--fnt-primary), "sans-serif" !important;
-  color: var(--clr-text) !important;
+  /* color: var(--clr-text) !important; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  overflow: hidden;
 }
 
 code {
@@ -29,16 +31,4 @@ code {
 }
 .out {
   border: 1px solid blue;
-}
-
-.d-sm-none {
-  display: none;
-}
-@media screen and (min-width: 768px) {
-  .d-md-block {
-    display: block;
-  }
-  .d-md-none {
-    display: none;
-  }
 }

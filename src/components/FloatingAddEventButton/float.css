@@ -1,0 +1,44 @@
+.empty-add-button,
+.floating-add-button {
+  background-color: var(--clr-secondary);
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  box-shadow: 10px 10px 34px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+.floating-add-button {
+  position: absolute;
+  right: 15px;
+  bottom: 10%;
+}
+
+.floating-add-button:hover,
+.floating-add-button:focus,
+.empty-add-button:hover,
+.empty-add-button:focus {
+  transform: scale(1.1);
+}
+
+.floating-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 50px;
+  max-width: 1140px;
+  width: 90%;
+}
+
+@media (min-width: 768px) {
+  .empty-add-button,
+  .floating-add-button {
+    width: 4rem;
+    height: 4rem;
+  }
+  .floating-add-button {
+    right: 0;
+  }
+}

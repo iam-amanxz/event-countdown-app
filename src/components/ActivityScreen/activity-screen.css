@@ -1,47 +1,54 @@
 .screen {
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-.screen__overlay {
-  border-radius: 10px;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: 0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  z-index: 0;
-}
-.screen__event-title {
-  font-family: var(--fnt-secondary);
-  font-size: 24px;
-  font-weight: 700;
-}
-.screen__event-date {
-  font-size: 18px;
+  display: grid;
+  place-items: center;
 }
 
-.screen__event-actions {
-  display: flex;
-  flex-direction: column;
-  /* justify-content: center; */
-  align-items: flex-end;
+.screen-card {
+  width: 90%;
+  max-width: 760px;
+  border-radius: 10px !important;
+  position: relative;
+  color: white !important;
+  fill: white !important;
+  backdrop-filter: blur(5px);
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden;
 }
-.screen__event-actions box-icon {
-  fill: var(--clr-text);
+
+.screen-card-overlay {
+  border-radius: 10px;
+  filter: blur(5px);
+  z-index: -1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.card-header {
+  border: none !important;
+}
+.screen__title {
+  font-size: 1.5rem !important;
+  font-family: var(--fnt-secondary) !important;
+  font-weight: 700 !important;
+}
+.screen__date {
+  font-size: 1.2rem;
+}
+
+.screen-card box-icon {
   cursor: pointer;
-  margin-bottom: 1rem;
+  transition: all 0.25s ease-in;
 }
-.screen__event-countdown-top,
-.screen__event-countdown-bottom {
+.screen-card box-icon:hover .screen-card box-icon:focus {
+  transform: translateY(-2px) scale(1.1);
+}
+
+.countdown {
   display: flex;
+  justify-content: space-between;
 }
 .months,
 .days,
@@ -52,41 +59,39 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 0.5rem;
 }
+
 .months__num,
 .days__num,
 .hours__num,
 .minutes__num,
 .seconds__num {
-  height: 50px;
-  min-width: 50px;
+  min-width: 45px;
+  height: 45px;
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-sizing: border-box;
   backdrop-filter: blur(4px);
-  border-radius: 10px;
+  border-radius: 5px;
   display: grid;
   place-items: center;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 1.4rem;
 }
 
-@media (min-width: 768px) {
-  .screen__event-title {
-    font-size: 32px;
-  }
-  .screen__event-date {
-    font-size: 22px;
-  }
+.activity-actions box-icon:hover {
+  transform: scale(1.1) translateY(3px);
+}
+
+@media (min-width: 560px) {
   .months__num,
   .days__num,
   .hours__num,
   .minutes__num,
   .seconds__num {
-    height: 65px;
     min-width: 65px;
-    font-size: 36px;
+    height: 65px;
+    font-size: 1.8rem;
   }
   .months__label,
   .days__label,
@@ -95,44 +100,37 @@
   .seconds__label {
     font-size: 18px;
   }
-  .screen-col {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    background-size: cover;
-    background-position: center;
+
+  .screen__title {
+    font-size: 1.9rem !important;
   }
-  .activity__medium {
-    height: 100%;
+  .screen__date {
+    font-size: 1.4rem;
   }
 }
-@media (min-width: 992px) {
-  .screen__event-title {
-    font-size: 40px;
+
+@media (min-width: 768px) {
+  .screen__title {
+    font-size: 2.5rem !important;
   }
-  .screen__event-date {
-    font-size: 24px;
+  .screen__date {
+    font-size: 1.8rem;
   }
+
   .months__num,
   .days__num,
   .hours__num,
   .minutes__num,
   .seconds__num {
-    height: 80px;
-    min-width: 80px;
-    font-size: 50px;
+    min-width: 90px;
+    height: 90px;
+    font-size: 3.4rem;
   }
   .months__label,
   .days__label,
   .hours__label,
   .minutes__label,
   .seconds__label {
-    font-size: 22px;
+    font-size: 24px;
   }
-}
-
-/* Should go to page */
-
-.activity {
-  height: 100vh;
 }

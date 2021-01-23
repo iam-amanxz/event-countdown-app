@@ -1,24 +1,33 @@
-import "boxicons";
+import React from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import * as ROUTES from "../../constants/routes";
+import "boxicons";
+
 import ActivityPage from "../../pages/ActivityPage";
-import LoginPage from "../../pages/LoginPage";
-import SignupPage from "../../pages/SignupPage";
-import PrivateRoute from "../PrivateRoute";
+import SignUpPage from "../../pages/SignupPage";
+import SignInPage from "../../pages/SigninPage";
 
-import "./App.css";
+import { AuthUserContext, withAuthentication } from "../../Session";
 
-function App() {
+import * as ROUTES from "../../constants/routes";
+
+const App = ({ authUser }) => {
   return (
     <Router>
-      <div className="app">
-        <PrivateRoute exact path="/" component={ActivityPage} />
-        {/* <Route exact path="/" component={ActivityPage} /> */}
-        <Route path={ROUTES.SIGN_IN} component={LoginPage} />
-        <Route path={ROUTES.SIGN_UP} component={SignupPage} />
-      </div>
+      <AuthUserContext.Consumer>
+        {(authUser) => (
+          <Route
+            exact
+            path={ROUTES.ACTIVITY}
+            render={(props) => (
+              <ActivityPage {...props} currentUser={authUser} />
+            )}
+          />
+        )}
+      </AuthUserContext.Consumer>
+      <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+      <Route path={ROUTES.SIGN_IN} component={SignInPage} />
     </Router>
   );
-}
+};
 
-export default App;
+export default withAuthentication(App);

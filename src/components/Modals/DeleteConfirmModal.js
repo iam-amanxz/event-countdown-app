@@ -1,75 +1,57 @@
 import React, { useState } from "react";
-import { Modal, Button, Form, Alert, Container } from "react-bootstrap";
-import "./modals.css";
-import { useApp } from "../../contexts/AppContext";
+import { Form, Modal, Button } from "react-bootstrap";
 
-const DeleteConfirmModal = () => {
-  const {
-    deleteEvent,
-    error,
-    setError,
-    fetchAllEvents,
-    currentEvent,
-    showDeleteModal,
-    setShowDeleteModal,
-  } = useApp();
+import { useEvent } from "../../contexts/EventContext";
+import { withFirebase } from "../../Firebase";
+
+const DeleteConfirmModal = ({ firebase, fetchAllEvents, currentUser }) => {
+  const { currentEvent, showDeleteModal, setShowDeleteModal } = useEvent();
 
   const [loading, setLoading] = useState(false);
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
-      await deleteEvent()
+      firebase
+        .deleteEvent(currentUser.id, currentEvent.id)
         .then(() => {
           console.log("Document successfully deleted!");
           fetchAllEvents();
           setShowDeleteModal(false);
         })
         .catch((e) => {
-          setError(e.message);
+          console.log(e);
         });
-    } catch (error) {
-      setError(error);
+    } catch (e) {
+      console.log(e);
     }
-    setLoading(false);
   };
 
   return (
-    <div>
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        className="event-creation-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Are you sure you want to delete?</Modal.Title>
-        </Modal.Header>
-        {error && (
-          <Container className="mt-3">
-            <Alert variant="danger">{error}</Alert>
-          </Container>
-        )}
-        <Form onSubmit={handleFormSubmit}>
-          <Modal.Footer>
-            <Button
-              block
-              variant="secondary"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={loading}
-            >
-              No
-            </Button>
-            <Button block variant="danger" type="submit" disabled={loading}>
-              Yes
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
-    </div>
+    <Modal show={showDeleteModal} className="event-creation-modal">
+      <Modal.Header closeButton>
+        <Modal.Title>Are you sure you want to delete?</Modal.Title>
+      </Modal.Header>
+
+      <Form onSubmit={handleFormSubmit}>
+        <Modal.Footer>
+          <Button
+            block
+            variant="secondary"
+            onClick={() => setShowDeleteModal(false)}
+            disabled={loading}
+          >
+            No
+          </Button>
+          <Button block variant="danger" type="submit" disabled={loading}>
+            Yes
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
   );
 };
 
-export default DeleteConfirmModal;
+export default withFirebase(DeleteConfirmModal);

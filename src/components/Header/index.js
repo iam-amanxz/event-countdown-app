@@ -1,46 +1,53 @@
 import React from "react";
-import { Col, Row } from "react-bootstrap";
-
-import { useApp } from "../../contexts/AppContext";
+import { Navbar, Container, Image } from "react-bootstrap";
+import { withRouter } from "react-router-dom";
+import { compose } from "recompose";
 import moment from "moment";
+import { withFirebase } from "../../Firebase";
+
+import * as ROUTES from "../../constants/routes";
 
 import "./header.css";
 
-const Header = () => {
-  const { currentUser, logout } = useApp();
+const Header = ({
+  firebase,
+  history,
+  currentUser,
+  setShowAvatarUploadModal,
+}) => {
+  const handleLogOut = () => {
+    firebase
+      .doSignOut()
+      .then(() => {
+        console.log("Sign out success");
+        history.push(ROUTES.SIGN_IN);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
+  };
 
   return (
-    <Col xs={12} className="header my-4">
-      <Row>
-        <Col xs={9} className="header__profile">
-          <div
-            className="header__profile-picture mr-2"
-            style={{ backgroundImage: `url(${currentUser.photoUrl})` }}
-          ></div>
-          <div className="header__profile-info">
-            <span className="profile-info__username">
-              Hello, {currentUser.username}
-            </span>
-            <span className="profile-info__date">
-              {moment().format("Do MMM [,] YYYY")}
-            </span>
+    <Navbar className="header">
+      <Container>
+        <div className="header__profile">
+          <Image
+            className="profile-avatar mr-3"
+            src={currentUser.avatarUrl}
+            roundedCircle
+            onClick={() => setShowAvatarUploadModal(true)}
+          />
+          <div>
+            <h5 className="m-0">Hello, {currentUser.username}</h5>
+            <p className="m-0"> {moment().format("Do MMM [,] YYYY")}</p>
           </div>
-        </Col>
-        <Col xs={3} className="header__settings">
-          <box-icon
-            name="power-off"
-            size="md"
-            onClick={async () => await logout()}
-          ></box-icon>
-          {/* <box-icon
-            name="dots-horizontal-rounded"
-            size="md"
-            onClick={async () => await logout()}
-          ></box-icon> */}
-        </Col>
-      </Row>
-    </Col>
+        </div>
+        <div className="logout-btn" onClick={handleLogOut}>
+          <box-icon name="power-off"></box-icon>
+        </div>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Header;
+export default compose(withRouter, withFirebase)(Header);

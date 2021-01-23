@@ -1,13 +1,26 @@
-import { Col, Container } from "react-bootstrap";
+import React from "react";
+import { Container } from "react-bootstrap";
+
+import "../Event/event.css";
 import Event from "../Event";
 
-export const EventList = ({ allEvents }) => {
+import { useEvent } from "../../contexts/EventContext";
+
+const EventList = () => {
+  const { allEvents } = useEvent();
+
   return (
-    <Col xs={12} className="mt-3 event-list">
-      <Container>
-        {allEvents &&
-          allEvents.map((event) => <Event event={event} key={event.id} />)}
-      </Container>
-    </Col>
+    <Container
+      style={{ display: "grid", placeItems: "center" }}
+      className="px-0 event-list-container"
+    >
+      <div className="event-list px-2">
+        {allEvents.map((event) => (
+          <Event event={event} key={event.id} />
+        ))}
+      </div>
+    </Container>
   );
 };
+
+export default EventList;
