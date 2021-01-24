@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert, ProgressBar } from "react-bootstrap";
-import DatePicker, {
-  utils,
-} from "@hassanmojab/react-modern-calendar-datepicker";
+import DatePicker from "react-datepicker";
 
 import { useEvent } from "../../contexts/EventContext";
 import { withFirebase } from "../../Firebase";
@@ -24,14 +22,7 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
   };
 
   const [formValues, setFormValues] = useState(INITIAL_STATE);
-
-  const today = new Date();
-  const defaultDateValue = {
-    year: today.getFullYear(),
-    month: today.getMonth() + 1,
-    day: today.getDate() + 1,
-  };
-  const [date, setDate] = useState(defaultDateValue);
+  const [date, setDate] = useState(new Date());
   const [imageAsFile, setImageAsFile] = useState("");
 
   const handleInputChange = (e) => {
@@ -116,7 +107,6 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(currentUser.id);
 
     setFormValues({
       ...formValues,
@@ -143,7 +133,7 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
             title: "",
             backgroundUrl: backgroundUrl,
           });
-          setDate(defaultDateValue);
+          setDate(new Date());
         })
         .catch((e) => {
           setFormValues({
@@ -187,11 +177,10 @@ const EventCreationModal = ({ firebase, currentUser, fetchAllEvents }) => {
           <Form.Group controlId="formBasicDate" className="d-flex flex-column">
             <Form.Label>Event Date</Form.Label>
             <DatePicker
-              value={date}
-              onChange={setDate}
-              inputPlaceholder="Select a date"
-              shouldHighlightWeekends
-              minimumDate={utils().getToday()}
+              selected={date}
+              onChange={(date) => setDate(date)}
+              showTimeSelect
+              minDate={new Date()}
             />
           </Form.Group>
 

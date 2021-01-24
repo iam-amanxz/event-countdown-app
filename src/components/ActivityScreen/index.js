@@ -9,16 +9,6 @@ import "./activity-screen.css";
 const ActivityScreen = () => {
   const { currentEvent, setShowEditModal, setShowDeleteModal } = useEvent();
 
-  const date = new Date(
-    currentEvent.date.year,
-    currentEvent.date.month - 1,
-    currentEvent.date.day,
-    0,
-    0,
-    0,
-    0
-  );
-
   const [months, setMonths] = useState(0);
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
@@ -38,16 +28,9 @@ const ActivityScreen = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const eventDate = new Date(
-        currentEvent.date.year,
-        currentEvent.date.month - 1,
-        currentEvent.date.day,
-        0,
-        0,
-        0,
-        0
-      );
+      const eventDate = new Date(currentEvent.date.seconds * 1000);
       const currentDate = new Date();
+
       setTotalSeconds((eventDate - currentDate) / 1000);
 
       if (totalSeconds < 0) {
@@ -92,7 +75,9 @@ const ActivityScreen = () => {
           </Card.Title>
 
           <Card.Text className="screen__date">
-            {moment(date).format("Do MMM [,] YYYY")}
+            {moment(new Date(currentEvent.date.seconds * 1000)).format(
+              "Do MMM [,] YYYY"
+            )}
           </Card.Text>
 
           {countdownOver && (

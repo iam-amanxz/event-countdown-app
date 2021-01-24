@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, ProgressBar } from "react-bootstrap";
-import DatePicker, {
-  utils,
-} from "@hassanmojab/react-modern-calendar-datepicker";
+import DatePicker from "react-datepicker";
 
 import { useEvent } from "../../contexts/EventContext";
 import { withFirebase } from "../../Firebase";
@@ -18,22 +16,7 @@ const EventEditModal = ({ firebase, currentUser, fetchAllEvents }) => {
       title: currentEvent.title,
       backgroundUrl: currentEvent.backgroundUrl,
     });
-
-    const currentDate = new Date(
-      currentEvent.date.year,
-      currentEvent.date.month - 1,
-      currentEvent.date.day,
-      0,
-      0,
-      0,
-      0
-    );
-    const defaultDateValue = {
-      year: currentDate.getFullYear(),
-      month: currentDate.getMonth() + 1,
-      day: currentDate.getDate(),
-    };
-    setDate(defaultDateValue);
+    setDate(new Date(currentEvent.date.seconds * 1000));
   }, [currentEvent]);
 
   const [formValues, setFormValues] = useState({
@@ -194,11 +177,10 @@ const EventEditModal = ({ firebase, currentUser, fetchAllEvents }) => {
           <Form.Group controlId="formBasicDate" className="d-flex flex-column">
             <Form.Label>Event Date</Form.Label>
             <DatePicker
-              value={date}
-              onChange={setDate}
-              inputPlaceholder="Select a date"
-              shouldHighlightWeekends
-              minimumDate={utils().getToday()}
+              selected={date}
+              onChange={(date) => setDate(date)}
+              showTimeSelect
+              minDate={new Date()}
             />
           </Form.Group>
 

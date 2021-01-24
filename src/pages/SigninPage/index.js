@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Container, Button, Form } from "react-bootstrap";
+import { Card, Container, Button, Form, Spinner } from "react-bootstrap";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
@@ -85,6 +85,18 @@ const SignInPage = ({ firebase, history }) => {
                 history.push(ROUTES.ACTIVITY);
               })
               .catch((e) => {
+                const user = firebase.auth.currentUser;
+                user
+                  .delete()
+                  .then(() => {
+                    console.log(`User deleted because of database problems`);
+                  })
+                  .catch((e) => {
+                    setFormValues({
+                      ...formValues,
+                      error: e.message,
+                    });
+                  });
                 setFormValues({
                   ...formValues,
                   error: e.message,
@@ -146,6 +158,16 @@ const SignInPage = ({ firebase, history }) => {
                   value={formValues.password}
                 />
               </Form.Group>
+
+              {formValues.loading && (
+                <div style={{ textAlign: "center" }}>
+                  <Spinner
+                    animation="border"
+                    variant="light"
+                    className="mb-3"
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
